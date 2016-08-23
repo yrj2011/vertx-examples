@@ -1,5 +1,8 @@
 package io.vertx.example.osgi.it;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.SharedMetricRegistries;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.example.osgi.service.DataService;
@@ -15,8 +18,13 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 import javax.inject.Inject;
+import javax.management.MBeanServer;
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -69,11 +77,15 @@ public class VertxServiceIT {
         mavenBundle("io.vertx", "vertx-auth-common").versionAsInProject(),
         mavenBundle("io.vertx", "vertx-jdbc-client").versionAsInProject(),
         mavenBundle("io.vertx", "vertx-sql-common").versionAsInProject(),
+
+        mavenBundle("io.vertx", "vertx-dropwizard-metrics").versionAsInProject(),
         mavenBundle("com.zaxxer", "HikariCP").versionAsInProject(),
         mavenBundle("org.hsqldb", "hsqldb").versionAsInProject(),
 
         mavenBundle("org.apache.felix", "org.apache.felix.ipojo").versionAsInProject(),
         mavenBundle("commons-io", "commons-io").versionAsInProject(),
+
+        mavenBundle("io.dropwizard.metrics", "metrics-core").versionAsInProject(),
 
         bundle("file:target/osgi-examples-3.3.2.jar"),
 
@@ -134,7 +146,18 @@ public class VertxServiceIT {
     await(() -> results.size() != 0);
     assertThat(results.size(), is(1));
     System.out.println("JDBC test results: " + results);
-  }
+
+    // === Metrics (JMX)
+    System.out.println("==== JMX ====");
+    assertThat(vertxService.isMetricsEnabled(), is(true));
+    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+    ObjectInstance instance = server.getObjectInstance(ObjectName.getInstance("vertx:name=vertx.event-loop-size"));
+    assertNotNull(instance);
+
+    MetricRegistry registry = SharedMetricRegistries.getOrCreate("my-registry");
+    Gauge gauge = registry.getGauges().get("http.clients.connections.max-pool-size");
+    assertNotNull(gauge);
+}
 
   private static void await(Callable<Boolean> action) throws Exception {
     if (action.call()) {

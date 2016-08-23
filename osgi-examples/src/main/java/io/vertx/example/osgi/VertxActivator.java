@@ -1,7 +1,9 @@
 package io.vertx.example.osgi;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.ext.dropwizard.DropwizardMetricsOptions;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -23,7 +25,13 @@ public class VertxActivator implements BundleActivator {
   public void start(BundleContext context) throws Exception {
     LOGGER.info("Creating Vert.x instance");
 
-    Vertx vertx = executeWithTCCLSwitch(() -> Vertx.vertx());
+    VertxOptions options = new VertxOptions().setMetricsOptions(new DropwizardMetricsOptions()
+        .setJmxEnabled(true)
+        .setJmxDomain("vertx")
+        .setRegistryName("my-registry")
+    );
+
+    Vertx vertx = executeWithTCCLSwitch(() -> Vertx.vertx(options), context, Vertx.class, DropwizardMetricsOptions.class);
 
     vertxRegistration = context.registerService(Vertx.class, vertx, null);
     LOGGER.info("Vert.x service registered");

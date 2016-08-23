@@ -15,13 +15,19 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
-      <version>${project.version}</version>
+      <version>3.4.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web</artifactId>
-      <version>${project.version}</version>
+      <version>3.4.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-dropwizard-metrics</artifactId>
+      <version>3.4.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -45,7 +51,7 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-jdbc-client</artifactId>
-      <version>${project.version}</version>
+      <version>3.4.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -136,6 +142,11 @@
       <artifactId>HikariCP</artifactId>
       <version>2.4.6</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-sql-common</artifactId>
+      <version>3.4.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
