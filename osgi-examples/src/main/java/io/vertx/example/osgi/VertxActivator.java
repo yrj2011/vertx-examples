@@ -3,6 +3,7 @@ package io.vertx.example.osgi;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.spi.VertxMetricsFactory;
 import io.vertx.ext.dropwizard.DropwizardMetricsOptions;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -29,9 +30,10 @@ public class VertxActivator implements BundleActivator {
         .setJmxEnabled(true)
         .setJmxDomain("vertx")
         .setRegistryName("my-registry")
+        .setFactory(VertxSpiHelper.lookup(VertxMetricsFactory.class, context, "dropwizard"))
     );
 
-    Vertx vertx = executeWithTCCLSwitch(() -> Vertx.vertx(options), context, Vertx.class, DropwizardMetricsOptions.class);
+    Vertx vertx = executeWithTCCLSwitch(() -> Vertx.vertx(options));
 
     vertxRegistration = context.registerService(Vertx.class, vertx, null);
     LOGGER.info("Vert.x service registered");
@@ -50,4 +52,6 @@ public class VertxActivator implements BundleActivator {
       ebRegistration = null;
     }
   }
+
+
 }
