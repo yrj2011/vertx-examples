@@ -155,7 +155,8 @@ public class VertxServiceIT {
     assertNotNull(instance);
 
     MetricRegistry registry = SharedMetricRegistries.getOrCreate("my-registry");
-    Gauge gauge = registry.getGauges().get("http.clients.connections.max-pool-size");
+    assertNotNull(registry);
+    Gauge gauge = registry.getGauges().get("vertx.http.clients.connections.pool-ratio");
     assertNotNull(gauge);
 }
 
