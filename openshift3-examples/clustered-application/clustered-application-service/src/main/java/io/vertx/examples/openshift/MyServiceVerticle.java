@@ -8,7 +8,7 @@ public class MyServiceVerticle extends AbstractVerticle {
   @Override
   public void start() throws Exception {
     vertx.eventBus().<String>consumer("request", message -> {
-       message.reply("hello " + message.body());
+       message.reply("hello " + message.body() + " from " + System.getenv("HOSTNAME"));
     });
 
     vertx.createHttpServer()

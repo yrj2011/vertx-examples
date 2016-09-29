@@ -10,8 +10,8 @@
 
     <property name="hazelcast.health.monitoring.delay.seconds">2</property>
 
-    <property name="hazelcast.max.no.heartbeat.seconds">5</property>
-    <property name="hazelcast.max.no.master.confirmation.seconds">10</property>
+    <property name="hazelcast.max.no.heartbeat.seconds">20</property>
+    <property name="hazelcast.max.no.master.confirmation.seconds">30</property>
     <property name="hazelcast.master.confirmation.interval.seconds">10</property>
     <property name="hazelcast.member.list.publish.interval.seconds">10</property>
     <property name="hazelcast.connection.monitor.interval">10</property>
