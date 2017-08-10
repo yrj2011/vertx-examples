@@ -52,7 +52,7 @@
 			<repositories>
 				<repository>
 					<id>staging</id>
-					<url>https://oss.sonatype.org/content/repositories/iovertx-3687/</url>
+					<url>3.5.0.Beta1oss.sonatype.org/content/repositories/snapshots/</url>
 				</repository>
 			</repositories>
 		</profile>
