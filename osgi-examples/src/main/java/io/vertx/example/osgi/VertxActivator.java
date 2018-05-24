@@ -6,6 +6,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 import static io.vertx.example.osgi.TcclSwitch.executeWithTCCLSwitch;
@@ -18,12 +19,13 @@ public class VertxActivator implements BundleActivator {
   private final static Logger LOGGER = Logger.getLogger("VertxPublisher");
   private ServiceRegistration<Vertx> vertxRegistration;
   private ServiceRegistration<EventBus> ebRegistration;
+  private Vertx vertx;
 
   @Override
   public void start(BundleContext context) throws Exception {
     LOGGER.info("Creating Vert.x instance");
 
-    Vertx vertx = executeWithTCCLSwitch(() -> Vertx.vertx());
+    vertx = executeWithTCCLSwitch((Callable<Vertx>) Vertx::vertx);
 
     vertxRegistration = context.registerService(Vertx.class, vertx, null);
     LOGGER.info("Vert.x service registered");
@@ -32,7 +34,7 @@ public class VertxActivator implements BundleActivator {
   }
 
   @Override
-  public void stop(BundleContext context) throws Exception {
+  public void stop(BundleContext context) {
     if (vertxRegistration != null) {
       vertxRegistration.unregister();
       vertxRegistration = null;
@@ -41,5 +43,7 @@ public class VertxActivator implements BundleActivator {
       ebRegistration.unregister();
       ebRegistration = null;
     }
+
+    vertx.close();
   }
 }

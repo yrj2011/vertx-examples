@@ -3,6 +3,7 @@ package io.vertx.example.osgi.it;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.example.osgi.service.DataService;
+import io.vertx.example.osgi.service.TestService;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,12 +14,16 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 import javax.inject.Inject;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -69,6 +74,7 @@ public class VertxServiceIT {
       mavenBundle("com.fasterxml.jackson.core", "jackson-annotations").versionAsInProject(),
 
       mavenBundle("io.reactivex.rxjava2", "rxjava").versionAsInProject(),
+      mavenBundle("io.reactivex", "rxjava").versionAsInProject(),
       mavenBundle("org.reactivestreams", "reactive-streams").versionAsInProject(),
 
       mavenBundle("io.vertx", "vertx-jwt").versionAsInProject(),
@@ -77,6 +83,7 @@ public class VertxServiceIT {
       mavenBundle("io.vertx", "vertx-web-client").versionAsInProject(),
       mavenBundle("io.vertx", "vertx-web-common").versionAsInProject(),
       mavenBundle("io.vertx", "vertx-rx-java2").versionAsInProject(),
+      mavenBundle("io.vertx", "vertx-rx-java").versionAsInProject(),
 
       mavenBundle("io.vertx", "vertx-auth-common").versionAsInProject(),
       mavenBundle("io.vertx", "vertx-jdbc-client").versionAsInProject(),
@@ -96,7 +103,8 @@ public class VertxServiceIT {
   @Test
   public void testThatTheServiceIsAvailable() throws Exception {
     for (Bundle bundle : context.getBundles()) {
-      System.out.println("[" + bundle.getBundleId() + "] - " + bundle.getSymbolicName() + " - " + bundle.getVersion());
+      System.out.println("[" + bundle.getBundleId() + "] - " + bundle.getSymbolicName() + " - " + bundle.getVersion() +
+        " - " + bundle.getState());
     }
 
     Class<?> loadClass = context.getBundle(0).loadClass("org.hsqldb.jdbcDriver");
@@ -146,6 +154,30 @@ public class VertxServiceIT {
     await(() -> results.size() != 0);
     assertThat(results.size(), is(1));
     System.out.println("JDBC test results: " + results);
+
+    runInternalTests();
+  }
+
+  private void runInternalTests() throws InvalidSyntaxException {
+    Collection<ServiceReference<TestService>> references = context.getServiceReferences(TestService.class, null);
+    AtomicBoolean failure = new AtomicBoolean();
+    references.forEach(ref -> {
+      TestService service = context.getService(ref);
+      System.out.println("Running internal test: " + service.getClass());
+      try {
+        service.run();
+        System.out.println("Internal test: " + service.getClass() + " [OK]");
+      } catch (Exception e) {
+        System.err.println("Test fail: " + service.getClass().getName() + " : " + e.getMessage());
+        failure.set(true);
+      } finally {
+        context.ungetService(ref);
+      }
+    });
+
+    if (failure.get()) {
+      throw new AssertionError("Failing internal tests - check log");
+    }
   }
 
   private static void await(Callable<Boolean> action) throws Exception {
