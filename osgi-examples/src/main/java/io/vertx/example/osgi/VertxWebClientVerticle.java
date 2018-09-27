@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 @Instantiate
 public class VertxWebClientVerticle extends AbstractVerticle {
 
-  private final static Logger LOGGER = Logger.getLogger("VertxWebClientVerticle");
+  private static final Logger LOGGER = Logger.getLogger("VertxWebClientVerticle");
 
   @Override
   public void start() throws Exception {
@@ -28,6 +28,14 @@ public class VertxWebClientVerticle extends AbstractVerticle {
       .map(HttpResponse::bodyAsString)
       .subscribe(
         s -> LOGGER.info("From web client: " + s),
+        Throwable::printStackTrace
+      );
+
+    client.get(8081, "localhost", "/templates/hb")
+      .rxSend()
+      .map(HttpResponse::bodyAsString)
+      .subscribe(
+        s -> LOGGER.info("Template Handlebar: " + s),
         Throwable::printStackTrace
       );
   }

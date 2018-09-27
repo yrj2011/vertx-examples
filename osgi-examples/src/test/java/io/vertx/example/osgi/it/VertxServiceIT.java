@@ -79,6 +79,12 @@ public class VertxServiceIT {
 
       mavenBundle("io.vertx", "vertx-jwt").versionAsInProject(),
       mavenBundle("io.vertx", "vertx-web").versionAsInProject(),
+      mavenBundle("io.vertx", "vertx-web-templ-handlebars").versionAsInProject(),
+      mavenBundle("io.vertx", "vertx-web-templ-freemarker").versionAsInProject(),
+      mavenBundle("com.github.jknack", "handlebars").versionAsInProject(),
+      mavenBundle("org.freemarker", "freemarker").versionAsInProject(),
+      mavenBundle("javax.servlet", "javax.servlet-api").version("3.0.1"),
+
       mavenBundle("io.vertx", "vertx-bridge-common").versionAsInProject(),
       mavenBundle("io.vertx", "vertx-web-client").versionAsInProject(),
       mavenBundle("io.vertx", "vertx-web-common").versionAsInProject(),
@@ -86,17 +92,26 @@ public class VertxServiceIT {
       mavenBundle("io.vertx", "vertx-rx-java").versionAsInProject(),
 
       mavenBundle("io.vertx", "vertx-auth-common").versionAsInProject(),
+      mavenBundle("io.vertx", "vertx-auth-jwt").versionAsInProject(),
       mavenBundle("io.vertx", "vertx-jdbc-client").versionAsInProject(),
       mavenBundle("io.vertx", "vertx-sql-common").versionAsInProject(),
+
+      mavenBundle("io.vertx", "vertx-mail-client").versionAsInProject(),
+
       mavenBundle("com.zaxxer", "HikariCP").versionAsInProject(),
       mavenBundle("org.hsqldb", "hsqldb").versionAsInProject(),
+
+      mavenBundle("io.vertx", "vertx-mongo-client").versionAsInProject(),
+      mavenBundle("org.mongodb", "mongodb-driver-async").versionAsInProject(),
 
       mavenBundle("org.apache.felix", "org.apache.felix.ipojo").versionAsInProject(),
       mavenBundle("commons-io", "commons-io").versionAsInProject(),
 
       bundle("file:target/osgi-examples-" + System.getProperty("project.version", "3.5.3") + ".jar"),
 
-      junitBundles()
+      junitBundles(),
+
+      cleanCaches()
     );
   }
 
@@ -167,7 +182,7 @@ public class VertxServiceIT {
       try {
         service.run();
         System.out.println("Internal test: " + service.getClass() + " [OK]");
-      } catch (Exception e) {
+      } catch (Throwable e) {
         System.err.println("Test fail: " + service.getClass().getName() + " : " + e.getMessage());
         failure.set(true);
       } finally {

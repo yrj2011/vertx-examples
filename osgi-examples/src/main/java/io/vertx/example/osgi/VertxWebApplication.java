@@ -10,6 +10,8 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.templ.freemarker.FreeMarkerTemplateEngine;
+import io.vertx.ext.web.templ.handlebars.HandlebarsTemplateEngine;
 import org.apache.felix.ipojo.annotations.*;
 
 import java.util.HashMap;
@@ -37,20 +39,44 @@ public class VertxWebApplication extends AbstractVerticle {
   private Map<String, JsonObject> products = new HashMap<>();
 
   @Validate
-  public void start() throws Exception {
+  public void start() {
     setUpInitialData();
     TcclSwitch.executeWithTCCLSwitch(() -> {
+
+      HandlebarsTemplateEngine hb  = HandlebarsTemplateEngine.create(vertx);
+      FreeMarkerTemplateEngine fm = FreeMarkerTemplateEngine.create(vertx);
+
       Router router = Router.router(vertx);
       router.route().handler(BodyHandler.create());
       router.get("/products/:productID").handler(this::handleGetProduct);
       router.put("/products/:productID").handler(this::handleAddProduct);
       router.get("/products").handler(this::handleListProducts);
 
+      router.get("/templates/hb").handler(rc -> {
+        hb.render(new JsonObject().put("foo", "clement").put("bar", "vert.x"), "templates/handlebars.hbs", ar -> {
+          if (ar.succeeded()) {
+            rc.response().end(ar.result());
+          } else {
+            rc.fail(ar.cause());
+          }
+        });
+      });
+
+      router.get("/templates/fm").handler(rc -> {
+        fm.render(new JsonObject().put("foo", "clement").put("bar", "vert.x"), "templates/freemarker.ftl", ar -> {
+          if (ar.succeeded()) {
+            rc.response().end(ar.result());
+          } else {
+            rc.fail(ar.cause());
+          }
+        });
+      });
+
       router.get("/assets/*").handler(StaticHandler.create("assets", this.getClass().getClassLoader()));
 
       LOGGER.info("Creating HTTP server for vert.x web application");
       HttpServer server = vertx.createHttpServer();
-      server.requestHandler(router::accept).listen(8081);
+      server.requestHandler(router).listen(8081);
     });
   }
 

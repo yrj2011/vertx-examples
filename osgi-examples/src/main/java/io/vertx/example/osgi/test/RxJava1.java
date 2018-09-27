@@ -20,6 +20,6 @@ public class RxJava1 implements TestService {
     System.out.println("Running " + this.getClass().getName());
     Vertx vertx = Vertx.vertx();
     Objects.requireNonNull(vertx, "Vert.x instance should not be null");
-
+    vertx.close();
   }
 }

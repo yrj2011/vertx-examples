@@ -20,11 +20,6 @@ public class JDBCServiceConsumer implements DataService {
   @Requires
   private JDBCClient client;
 
-  @Validate
-  public void start() {
-
-  }
-
   @Override
   public void retrieve(Handler<AsyncResult<List<String>>> resultHandler) {
     client.getConnection(conn -> {
@@ -34,7 +29,7 @@ public class JDBCServiceConsumer implements DataService {
       }
 
       final SQLConnection connection = conn.result();
-      connection.execute("create table test(id int primary key, name varchar(255))", res -> {
+      connection.execute("create table IF NOT EXISTS test(id int primary key, name varchar(255))", res -> {
         if (res.failed()) {
           resultHandler.handle(Future.failedFuture(res.cause()));
           return;
