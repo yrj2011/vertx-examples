@@ -47,6 +47,8 @@ public class Application {
    */
   @EventListener
   void deployVerticles(ApplicationReadyEvent event) {
+    port = 8081;
+    System.out.println("deployVerticles event:"+ event);
     vertx.deployVerticle(new HelloVerticle());
     if (port != null) {
       JsonObject config = new JsonObject().put("port", port);

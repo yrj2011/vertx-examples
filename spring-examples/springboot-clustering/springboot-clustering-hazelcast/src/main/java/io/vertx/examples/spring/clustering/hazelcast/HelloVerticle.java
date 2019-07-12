@@ -29,8 +29,8 @@ public class HelloVerticle extends AbstractVerticle {
 
   @Override
   public void start(Future<Void> startFuture) throws Exception {
-    vertx.eventBus().<String>consumer("hello", message -> {
+  /*  vertx.eventBus().<String>consumer("hello", message -> {
       message.reply("Hello " + message.body() + " from " + ID);
-    }).completionHandler(startFuture);
+    }).completionHandler(startFuture);*/
   }
 }
