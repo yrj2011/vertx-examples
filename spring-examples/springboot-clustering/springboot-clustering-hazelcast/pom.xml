@@ -19,7 +19,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
+  <packaging>jar</packaging>
   <parent>
     <groupId>io.vertx</groupId>
     <artifactId>springboot-clustering</artifactId>
@@ -70,6 +70,25 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>${boot.version}</version>
+        <!-- <configuration>
+           <fork>true</fork>
+           <mainClass>io.vertx.examples.spring.clustering.hazelcast.Application</mainClass>
+           &lt;!&ndash;主类 包含main&ndash;&gt;
+           <layout>JAR</layout>
+           &lt;!&ndash;-包类型(必须大写) JAR，WAR，ZIP，MODULE，NONE &ndash;&gt;
+       </configuration>-->
+        <executions>
+          <execution>
+            <goals>
+              <!--可以把依赖的包都打包到生成的Jar包中 -->
+              <goal>repackage</goal>
+            </goals>
+            <!--可以生成不含依赖包的不可执行Jar包 -->
+            <configuration>
+              <classifier>exec</classifier>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
