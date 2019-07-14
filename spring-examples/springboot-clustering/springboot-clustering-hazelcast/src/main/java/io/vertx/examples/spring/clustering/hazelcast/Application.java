@@ -38,7 +38,13 @@ public class Application {
   @Value("${systemProperties.httpPort:#{null}}")
   Integer port;
 
+  private static int PORT = 8081;
   public static void main(String[] args) {
+    try{
+      PORT = Integer.parseInt(args[0]);
+    }catch (Exception e){
+      e.printStackTrace();
+    }
     SpringApplication.run(Application.class, args);
   }
 
@@ -47,7 +53,7 @@ public class Application {
    */
   @EventListener
   void deployVerticles(ApplicationReadyEvent event) {
-    port = 8081;
+    port = PORT;
     System.out.println("deployVerticles event:"+ event);
     vertx.deployVerticle(new HelloVerticle());
     if (port != null) {
